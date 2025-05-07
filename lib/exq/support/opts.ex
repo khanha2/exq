@@ -50,7 +50,16 @@ defmodule Exq.Support.Opts do
       )
 
     if url = opts[:url] || Config.get(:url) do
-      [url, redis_options]
+      options = Redix.URI.to_start_options(url)
+
+      redis_options =
+        if options[:ssl] == true do
+          Keyword.put(redis_options, :socket_opts, verify: :verify_none)
+        else
+          redis_options
+        end
+
+      [Keyword.merge(options, redis_options)]
     else
       if Keyword.has_key?(redis_options, :sentinel) do
         [redis_options]
