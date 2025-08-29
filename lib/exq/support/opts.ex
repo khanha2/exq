@@ -50,7 +50,10 @@ defmodule Exq.Support.Opts do
       )
 
     if url = opts[:url] || Config.get(:url) do
-      options = Redix.URI.to_start_options(url)
+      options =
+        url
+        |> String.trim()
+        |> Redix.URI.to_start_options()
 
       redis_options =
         if options[:ssl] == true do
